@@ -3,12 +3,11 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import Container from "./components/Container";
 import SearchInput from "./components/SearchInput";
+import Info from "./components/Info";
+import Todos from "./components/Todos";
+import Empty from "./components/Empty";
 
 import { useState } from "react";
-import classnames from "classnames";
-
-import plusIcon from "./assets/plus-icon.svg";
-import minusIcon from "./assets/minus-icon.svg";
 
 function App() {
   const [value, setValue] = useState("");
@@ -68,6 +67,12 @@ function App() {
 
     setTodos(newTodos);
   };
+  const getTotalCounts = () => {
+    const totalCounts = todos.reduce((total, num) => {
+      return total + num.count;
+    }, 0);
+    return totalCounts;
+  };
   return (
     <>
       <Navbar />
@@ -77,57 +82,24 @@ function App() {
           onChange={(e) => setValue(e.target.value)}
           value={value}
         />
-        <div className="info">
-          <div className="info-total">
-            <p>Total List</p>
-          </div>
-          <div className="info-total">
-            <p>Total List</p>
-          </div>
-          <button className="delete-all-button">
-            <p>Delete All List</p>
-          </button>
-        </div>
+        <Info
+          todosLength={todos.length}
+          totalCounts={getTotalCounts()}
+          onDelete={() => setTodos([])}
+        />
 
         {todos.length > 0 ? (
-          <div className="todos">
-            {todos.map((todo, index, arr) => {
-              return (
-                <div
-                  //dont forget key for method map
-                  key={index}
-                  //to add class with JS
-                  className={`todo ${
-                    !(arr.length === index + 1) && `todo-divider`
-                  }`}
-                >
-                  {todo.title}
-                  <div className="todo-icon-wrapper">
-                    <div className="todo-count">{todo.count}</div>
-                    <button
-                      className="todo-action-button"
-                      onClick={() => {
-                        handleSubtractionCount(index);
-                      }}
-                    >
-                      <img src={minusIcon} alt="minus-icon" />
-                    </button>
-                    <button
-                      className="todo-action-button"
-                      onClick={() => {
-                        handleAdditionCount(index);
-                      }}
-                    >
-                      <img src={plusIcon} alt="plus-icon" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            ;
-          </div>
+          <Todos
+            todos={todos}
+            onSubstraction={(index) => {
+              handleSubtractionCount(index);
+            }}
+            onAddition={(index) => {
+              handleAdditionCount(index);
+            }}
+          />
         ) : (
-          <div>Kosong</div>
+          <Empty />
         )}
       </Container>
     </>
